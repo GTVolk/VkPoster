@@ -1,4 +1,4 @@
-package ru.devvault.client.vk.poster;
+package ru.devvault.client.vk.poster.configuration;
 
 import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;

@@ -1,4 +1,4 @@
-package ru.devvault.client.vk.poster;
+package ru.devvault.client.vk.poster.enums;
 
 import lombok.AllArgsConstructor;
 

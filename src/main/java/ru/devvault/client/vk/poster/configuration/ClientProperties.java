@@ -1,4 +1,4 @@
-package ru.devvault.client.vk.poster;
+package ru.devvault.client.vk.poster.configuration;
 
 
 import lombok.Getter;
@@ -7,6 +7,7 @@ import lombok.ToString;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
+import ru.devvault.client.vk.poster.enums.AuthType;
 
 import javax.validation.constraints.*;
 import java.util.Collections;

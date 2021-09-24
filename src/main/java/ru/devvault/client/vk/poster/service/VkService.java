@@ -1,13 +1,11 @@
-package ru.devvault.client.vk.poster;
+package ru.devvault.client.vk.poster.service;
 
 import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.vk.api.sdk.client.AbstractQueryBuilder;
-import com.vk.api.sdk.client.TransportClient;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
 import com.vk.api.sdk.exceptions.*;
-import com.vk.api.sdk.httpclient.HttpTransportClient;
 import com.vk.api.sdk.objects.UserAuthResponse;
 import com.vk.api.sdk.objects.Validable;
 import com.vk.api.sdk.objects.base.UserGroupFields;
@@ -28,6 +26,8 @@ import com.vk.api.sdk.objects.wall.responses.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import ru.devvault.client.vk.poster.error.MyApiException;
+import ru.devvault.client.vk.poster.error.MyError;
 
 import java.io.StringReader;
 import java.lang.reflect.Type;
@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Scanner;
 
 import static java.util.Objects.isNull;
-import static java.util.Objects.nonNull;
 
 @Slf4j
 @Service
