@@ -20,11 +20,21 @@ import java.util.Set;
 @Setter
 @ToString
 public class ClientProperties {
+
     @NotNull
-    @Min(1)
-    private Integer userId;
+    private AuthType authType = AuthType.TOKEN;
+
+    private Integer appId;
+
+    private String secretKey = "";
 
     @NotBlank
+    private String redirectUri = "https://oauth.vk.com/blank.html";
+
+    private String authorizationCode = "";
+
+    private Integer userId;
+
     private String accessToken = "";
 
     @NotBlank
