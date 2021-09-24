@@ -26,15 +26,6 @@ import com.vk.api.sdk.objects.wall.GetFilter;
 import com.vk.api.sdk.objects.wall.WallpostFull;
 import com.vk.api.sdk.objects.wall.responses.GetResponse;
 import com.vk.api.sdk.objects.wall.responses.PostResponse;
-import com.vk.api.sdk.objects.wall.responses.SearchResponse;
-import com.vk.api.sdk.queries.board.BoardCreateCommentQuery;
-import com.vk.api.sdk.queries.board.BoardGetCommentsQuery;
-import com.vk.api.sdk.queries.board.BoardGetTopicsQuery;
-import com.vk.api.sdk.queries.fave.FaveGetPagesQuery;
-import com.vk.api.sdk.queries.fave.FaveGetTagsQuery;
-import com.vk.api.sdk.queries.wall.WallGetQuery;
-import com.vk.api.sdk.queries.wall.WallPostQuery;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,7 +35,6 @@ import java.lang.reflect.Type;
 import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static java.util.Objects.nonNull;
@@ -64,20 +54,6 @@ public class VkService {
 
     private String captchaSid;
     private String captchaKey;
-
-    public Boolean authorize() {
-        try {
-            TransportClient transportClient = new HttpTransportClient();
-            apiClient = new VkApiClient(transportClient);
-            userActor = new UserActor(clientProperties.getUserId(), clientProperties.getAccessToken());
-        } catch (Exception e) {
-            log.error("Authorization exception: {}", e.getMessage());
-
-            return false;
-        }
-
-        return true;
-    }
 
     private <T> void validateValidable(String textResponse, T result) throws ClientException {
         try {
@@ -132,7 +108,7 @@ public class VkService {
         }
     }
 
-    private void fillCaptchaRequest(MyError e) {
+    private void fillCaptchaSidAndKey(MyError e) {
         captchaSid = e.getCaptchaSid();
         log.warn("Captcha image URL: {}", e.getCaptchaImg());
 
@@ -142,7 +118,7 @@ public class VkService {
         captchaKey = scanner.next();
     }
 
-    private <T, R> void addCaptchaData(AbstractQueryBuilder<T, R> queryBuilder) {
+    private <T, R> void addCaptchaDataToQuery(AbstractQueryBuilder<T, R> queryBuilder) {
         if (nonNull(captchaSid) && nonNull(captchaKey)) {
             queryBuilder.captchaSid(captchaSid);
             queryBuilder.captchaKey(captchaKey);
@@ -152,23 +128,37 @@ public class VkService {
         }
     }
 
-    private <T, R> R getData(AbstractQueryBuilder<T, R> query, Class<R> responseType) throws ApiException, ClientException {
+    private <T, R> R getQueryData(AbstractQueryBuilder<T, R> query, Class<R> responseType) throws ApiException, ClientException {
         try {
-            addCaptchaData(query);
+            addCaptchaDataToQuery(query);
             return execute(query.executeAsString(), responseType);
         } catch (MyApiException e) {
             if (e.getCode().equals(CAPTCHA_ERROR_CODE)) {
-                fillCaptchaRequest(e.getError());
-                return getData(query, responseType);
+                fillCaptchaSidAndKey(e.getError());
+                return getQueryData(query, responseType);
             }
 
             throw e;
         }
     }
 
+    public Boolean authorize() {
+        try {
+            TransportClient transportClient = new HttpTransportClient();
+            apiClient = new VkApiClient(transportClient);
+            userActor = new UserActor(clientProperties.getUserId(), clientProperties.getAccessToken());
+        } catch (Exception e) {
+            log.error("Authorization exception: {}", e.getMessage());
+
+            return false;
+        }
+
+        return true;
+    }
+
     public List<Integer> getTags() {
         try {
-            return getData(
+            return getQueryData(
                     apiClient
                             .fave()
                             .getTags(userActor),
@@ -186,7 +176,7 @@ public class VkService {
 
     public List<Page> getTagPages(Integer tagId) {
         try {
-            return getData(
+            return getQueryData(
                     apiClient
                             .fave()
                             .getPages(userActor)
@@ -205,7 +195,7 @@ public class VkService {
 
     public List<Topic> getGroupTopics(Integer groupId) {
         try {
-            return getData(
+            return getQueryData(
                     apiClient
                             .board()
                             .getTopics(userActor, groupId)
@@ -219,49 +209,9 @@ public class VkService {
         return Collections.emptyList();
     }
 
-    public boolean postTopicComment(Integer groupId, Integer topicId) {
+    public TopicComment getTopicComment(Integer groupId, Integer topicId) {
         try {
-            return getData(
-                    apiClient
-                            .board()
-                            .createComment(userActor, groupId, topicId)
-                            .fromGroup(false)
-                            .guid(clientProperties.getUserId().toString() + groupId.toString() + topicId.toString())
-                            .message(clientProperties.getPostMessage()),
-                    Integer.class
-            ) > 0;
-        } catch (ApiException | ClientException e) {
-            log.error("Post topic comment error: {}", e.getMessage());
-        }
-
-        return false;
-    }
-
-    public boolean postGroupMessage(Integer groupId) {
-        try {
-            return getData(
-                    apiClient
-                            .wall()
-                            .post(userActor)
-                            .ownerId(-groupId)
-                            .fromGroup(false)
-                            .friendsOnly(false)
-                            .signed(true)
-                            .guid(clientProperties.getUserId().toString() + groupId.toString())
-                            .markAsAds(false)
-                            .message(clientProperties.getPostMessage()),
-                    PostResponse.class
-            ).getPostId() > 0;
-        } catch (ApiException | ClientException e) {
-            log.error("Post group message error: {}", e.getMessage());
-        }
-
-        return false;
-    }
-
-    public TopicComment getLatestTopicComment(Integer groupId, Integer topicId) {
-        try {
-            Integer count = getData(
+            Integer count = getQueryData(
                     apiClient
                             .board()
                             .getComments(userActor, groupId, topicId)
@@ -269,7 +219,7 @@ public class VkService {
                     GetCommentsResponse.class
             ).getCount();
 
-            return getData(
+            return getQueryData(
                     apiClient
                             .board()
                             .getComments(userActor, groupId, topicId)
@@ -287,9 +237,27 @@ public class VkService {
         return null;
     }
 
+    public boolean createTopicComment(Integer groupId, Integer topicId) {
+        try {
+            return getQueryData(
+                    apiClient
+                            .board()
+                            .createComment(userActor, groupId, topicId)
+                            .fromGroup(false)
+                            .guid(clientProperties.getUserId().toString() + groupId.toString() + topicId.toString())
+                            .message(clientProperties.getPostMessage()),
+                    Integer.class
+            ) > 0;
+        } catch (ApiException | ClientException e) {
+            log.error("Post topic comment error: {}", e.getMessage());
+        }
+
+        return false;
+    }
+
     public WallpostFull getGroupPost(Integer groupId, GetFilter getFilter) {
         try {
-            return getData(
+            return getQueryData(
                     apiClient
                             .wall()
                             .get(userActor)
@@ -306,5 +274,27 @@ public class VkService {
         }
 
         return null;
+    }
+
+    public boolean postWallMessage(Integer groupId) {
+        try {
+            return getQueryData(
+                    apiClient
+                            .wall()
+                            .post(userActor)
+                            .ownerId(-groupId)
+                            .fromGroup(false)
+                            .friendsOnly(false)
+                            .signed(true)
+                            .guid(clientProperties.getUserId().toString() + groupId.toString())
+                            .markAsAds(false)
+                            .message(clientProperties.getPostMessage()),
+                    PostResponse.class
+            ).getPostId() > 0;
+        } catch (ApiException | ClientException e) {
+            log.error("Post group message error: {}", e.getMessage());
+        }
+
+        return false;
     }
 }
