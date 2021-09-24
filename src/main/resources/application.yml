@@ -1,0 +1,17 @@
+ru:
+  devvault:
+    client:
+      vk:
+        poster:
+          userId: 243463
+          accessToken: "d010d0048d5900000b50330d0d0e00000ea67e9fc9d0000001e1a1155f1958f6f6a0e1247641da8610000"
+          tags:
+            - "Группы по продаже"
+            - "Группы объявлений"
+          postMessage: "Продам гараж, срочно, мой телефон +7 (999) 399 29 29"
+          postMessageQuery: "Продам гараж"
+          postToGroups: true
+          postToGroupsTopics: true
+          tagPagesQuerySize: 50
+          groupPostQuerySize: 15
+          groupTopicQuerySize: 10
