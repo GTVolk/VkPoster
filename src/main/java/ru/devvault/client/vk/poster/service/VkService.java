@@ -1,11 +1,19 @@
 package ru.devvault.client.vk.poster.service;
 
-import com.google.gson.*;
+import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.google.gson.JsonSyntaxException;
 import com.google.gson.stream.JsonReader;
 import com.vk.api.sdk.client.AbstractQueryBuilder;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
-import com.vk.api.sdk.exceptions.*;
+import com.vk.api.sdk.exceptions.ApiException;
+import com.vk.api.sdk.exceptions.ClientException;
+import com.vk.api.sdk.exceptions.ExceptionMapper;
+import com.vk.api.sdk.exceptions.OAuthException;
+import com.vk.api.sdk.exceptions.RequiredFieldException;
 import com.vk.api.sdk.objects.UserAuthResponse;
 import com.vk.api.sdk.objects.Validable;
 import com.vk.api.sdk.objects.base.UserGroupFields;
@@ -104,8 +112,7 @@ public class VkService {
                 throw new ClientException("Can't parse json response");
             }
 
-            MyApiException exception = MyApiException.of(ExceptionMapper.parseException(error));
-            exception.setError(error);
+            MyApiException exception = MyApiException.of(ExceptionMapper.parseException(error), error);
 
             log.error("API error", exception);
             throw exception;
@@ -266,11 +273,12 @@ public class VkService {
                     GetCommentsResponse.class
             ).getCount();
 
+            int page = Math.floorDiv(count, getTopicCommentsQuerySize());
             return getQueryData(
                     apiClient
                             .board()
                             .getComments(userActor, group.getId(), topic.getId())
-                            .offset(Math.floorDiv(count > 0 ? count - 1 : 0, getTopicCommentsQuerySize()) * getTopicCommentsQuerySize())
+                            .offset((page > 0 ? page - 1 : 0) * getTopicCommentsQuerySize())
                             .count(getTopicCommentsQuerySize() * 2),
                     GetCommentsResponse.class
             ).getItems();

@@ -77,7 +77,7 @@ public class PosterService {
                     log.info("Topic comment already exists! Group: {}, topic: {}, comment: {}", group, topic, comment);
                 }
 
-                Thread.sleep(clientProperties.getQueryInterval() * 3);
+                Thread.sleep(clientProperties.getQueryInterval() * 3L);
             } else {
                 log.info("Processing topic excluded! Group: {}, topic: {}", group, topic);
             }
@@ -110,7 +110,7 @@ public class PosterService {
                 log.info("Post already exists! Group: {}, post: {}", group, post);
             }
 
-            Thread.sleep(clientProperties.getQueryInterval() * 3);
+            Thread.sleep(clientProperties.getQueryInterval() * 3L);
         } else {
             log.info("Processing group excluded! Group: {}", group);
         }
