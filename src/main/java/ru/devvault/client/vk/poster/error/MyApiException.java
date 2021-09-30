@@ -10,10 +10,6 @@ public class MyApiException extends ApiException {
         this.error = error;
     }
 
-    public MyApiException(Integer code, String description, String message) {
-        this(code, description, message, null);
-    }
-
     public static MyApiException of(ApiException source, MyError error) {
         return new MyApiException(source.getCode(), source.getDescription(), source.getMessage(), error);
     }
