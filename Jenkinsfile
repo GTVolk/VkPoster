@@ -3,8 +3,11 @@ node {
     checkout scm
   }
   stage('SonarQube Analysis') {
+    generateWrapper() {
+        sh "/usr/bin/gradle wrapper"
+    }
     withSonarQubeEnv() {
-      sh "/usr/bin/gradle sonarqube"
+      sh "./gradlew sonarqube"
     }
   }
 }
