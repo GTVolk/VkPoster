@@ -51,6 +51,6 @@ tasks.withType<Test> {
 
 sonarqube {
   properties {
-    property "sonar.projectKey", "GTVolk_VkPoster"
+    property("sonar.projectKey", "GTVolk_VkPoster")
   }
 }
