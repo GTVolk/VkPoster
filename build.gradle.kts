@@ -18,12 +18,6 @@ configurations {
 	}
 }
 
-sonarqube {
-  properties {
-    property "sonar.projectKey", "GTVolk_VkPoster"
-  }
-}
-
 repositories {
 	mavenLocal()
 	mavenCentral()
@@ -52,4 +46,11 @@ tasks.withType<KotlinCompile> {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+
+sonarqube {
+  properties {
+    property "sonar.projectKey", "GTVolk_VkPoster"
+  }
 }
