@@ -27,14 +27,14 @@ dependencies {
 	implementation("com.vk.api:sdk:1.0.11") {
 		exclude("org.apache.logging.log4j")
 	}
-	implementation("org.springframework.boot:spring-boot-starter")
-	implementation("org.springframework.boot:spring-boot-starter-validation")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
-	compileOnly("org.projectlombok:lombok")
-	annotationProcessor("org.projectlombok:lombok")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation("org.springframework.boot:spring-boot-starter:2.5.6")
+	implementation("org.springframework.boot:spring-boot-starter-validation:2.5.6")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
+	implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.31")
+	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31")
+	compileOnly("org.projectlombok:lombok:1.18.22")
+	annotationProcessor("org.projectlombok:lombok:1.18.22")
+	testImplementation("org.springframework.boot:spring-boot-starter-test:2.5.6")
 }
 
 tasks.withType<KotlinCompile> {

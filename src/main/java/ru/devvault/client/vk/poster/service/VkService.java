@@ -344,6 +344,9 @@ public class VkService {
             log.error("Group {} post message error: {}", group, e.getMessage());
         }
 
-        return new PostResponse();
+        PostResponse nullObject = new PostResponse();
+        nullObject.setPostId(0);
+
+        return nullObject;
     }
 }
