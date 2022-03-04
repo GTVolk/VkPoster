@@ -4,8 +4,6 @@ import lombok.AllArgsConstructor;
 
 @AllArgsConstructor
 public enum AuthType {
-    CODE_FLOW("CODE"),
-    TOKEN("TOKEN");
-
-    private final String type;
+    CODE_FLOW,
+    TOKEN
 }

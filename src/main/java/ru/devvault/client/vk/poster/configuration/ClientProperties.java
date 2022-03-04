@@ -33,6 +33,8 @@ public class ClientProperties {
 
     private String secretKey = "";
 
+    private String serviceKey = "";
+
     @NotBlank
     private String redirectUri = "https://oauth.vk.com/blank.html";
 

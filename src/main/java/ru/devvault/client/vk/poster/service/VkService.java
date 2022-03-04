@@ -43,6 +43,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 
+import static java.lang.String.format;
 import static java.util.Objects.isNull;
 
 @Slf4j
@@ -87,38 +88,36 @@ public class VkService {
 
     private <T> void validateValidable(String textResponse, T result) throws ClientException {
         try {
-            Validable validable = (Validable) result;
+            var validable = (Validable) result;
             validable.validateRequired();
-        } catch (RequiredFieldException e) {
-            throw new ClientException("JSON validate fail: " + textResponse + "\n" + e.toString());
-        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-            throw new ClientException("JSON validate fail:" + textResponse + e.toString());
+        } catch (RequiredFieldException | ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+            throw new ClientException(format("JSON validate fail: %s%n%s", textResponse, e));
         }
     }
 
     private <T> T execute(String textResponse, Type responseClass) throws ClientException, ApiException {
         log.debug("Response json: {}", textResponse);
 
-        JsonReader jsonReader = new JsonReader(new StringReader(textResponse));
-        JsonObject json = (JsonObject) JsonParser.parseReader(jsonReader);
+        var jsonReader = new JsonReader(new StringReader(textResponse));
+        var json = (JsonObject) JsonParser.parseReader(jsonReader);
 
         if (json.has("error")) {
-            JsonElement errorElement = json.get("error");
+            var errorElement = json.get("error");
             MyError error;
             try {
                 error = gson.fromJson(errorElement, MyError.class);
             } catch (JsonSyntaxException e) {
-                log.error("Invalid JSON: " + textResponse, e);
+                log.error("Invalid JSON: {}", textResponse);
                 throw new ClientException("Can't parse json response");
             }
 
-            MyApiException exception = MyApiException.of(ExceptionMapper.parseException(error), error);
+            var exception = MyApiException.of(ExceptionMapper.parseException(error), error);
 
             log.error("API error", exception);
             throw exception;
         }
 
-        JsonElement response = json;
+        var response = (JsonElement) json;
         if (json.has("response")) {
             response = json.get("response");
         }
@@ -133,12 +132,12 @@ public class VkService {
 
             return result;
         } catch (JsonSyntaxException e) {
-            throw new ClientException("Can't parse json response: " + textResponse + "\n" + e.toString());
+            throw new ClientException(format("Can't parse json response: %s%n%s", textResponse, e));
         }
     }
 
     private String readInput(String prompt) {
-        System.out.print(String.format("%s: ", prompt));
+        System.out.printf("%s: ", prompt);
         return scanner.next();
     }
 
@@ -265,7 +264,7 @@ public class VkService {
 
     public List<TopicComment> getTopicComments(GroupFull group, Topic topic) {
         try {
-            Integer count = getQueryData(
+            var count = getQueryData(
                     apiClient
                             .board()
                             .getComments(userActor, group.getId(), topic.getId())
@@ -273,7 +272,7 @@ public class VkService {
                     GetCommentsResponse.class
             ).getCount();
 
-            int page = Math.floorDiv(count, getTopicCommentsQuerySize());
+            var page = Math.floorDiv(count, getTopicCommentsQuerySize());
             return getQueryData(
                     apiClient
                             .board()
@@ -296,7 +295,7 @@ public class VkService {
                             .board()
                             .createComment(userActor, group.getId(), topic.getId())
                             .fromGroup(false)
-                            .guid(String.format("%d%d%d", userActor.getId(), group.getId(), topic.getId()))
+                            .guid(format("%d%d%d", userActor.getId(), group.getId(), topic.getId()))
                             .message(message),
                     Integer.class
             );
@@ -335,7 +334,7 @@ public class VkService {
                             .fromGroup(false)
                             .friendsOnly(false)
                             .signed(true)
-                            .guid(String.format("%d%d", userActor.getId(), group.getId()))
+                            .guid(format("%d%d", userActor.getId(), group.getId()))
                             .markAsAds(false)
                             .message(message),
                     PostResponse.class
@@ -344,7 +343,7 @@ public class VkService {
             log.error("Group {} post message error: {}", group, e.getMessage());
         }
 
-        PostResponse nullObject = new PostResponse();
+        var nullObject = new PostResponse();
         nullObject.setPostId(0);
 
         return nullObject;

@@ -2,7 +2,6 @@ package ru.devvault.client.vk.poster.service;
 
 import com.vk.api.sdk.objects.board.Topic;
 import com.vk.api.sdk.objects.board.TopicComment;
-import com.vk.api.sdk.objects.fave.Page;
 import com.vk.api.sdk.objects.fave.Tag;
 import com.vk.api.sdk.objects.groups.GroupFull;
 import com.vk.api.sdk.objects.wall.GetFilter;
@@ -13,9 +12,9 @@ import org.springframework.stereotype.Service;
 import ru.devvault.client.vk.poster.configuration.ClientProperties;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
+import static java.lang.Boolean.FALSE;
 import static java.util.Objects.isNull;
 
 @Slf4j
@@ -27,7 +26,7 @@ public class PosterService {
     private final VkService vkService;
 
     public Boolean authorizeClient() {
-        Boolean authResult = Boolean.FALSE;
+        var authResult = FALSE;
         switch (clientProperties.getAuthType()) {
             case CODE_FLOW:
                 log.info("Trying to authorize by code flow");
@@ -54,19 +53,24 @@ public class PosterService {
         return authResult;
     }
 
-    private void sendTopicComments(GroupFull group) throws InterruptedException {
-        if (Boolean.FALSE.equals(clientProperties.getPostToGroupsTopics())) return;
+    private TopicComment queryComment(GroupFull group, Topic topic) {
+        return vkService.getTopicComments(group, topic).stream()
+                .filter(i -> i.getText().contains(clientProperties.getPostMessageQuery()))
+                .findAny()
+                .orElse(null);
+    }
 
-        Set<Integer> excludedTopics = clientProperties.getExcludedGroupsTopics().get(group.getId());
-        for (Topic topic : vkService.getGroupTopics(group)) {
+    private void sendTopicComments(GroupFull group) throws InterruptedException {
+        if (FALSE.equals(clientProperties.getPostToGroupsTopics())) return;
+
+        var excludedTopics = clientProperties.getExcludedGroupsTopics().get(group.getId());
+        for (var topic : vkService.getGroupTopics(group)) {
             if (isNull(excludedTopics) || !excludedTopics.contains(topic.getId())) {
 
                 log.info("Selected topic: {}", topic);
 
-                TopicComment comment = vkService.getTopicComments(group, topic).stream()
-                        .filter(i -> i.getText().contains(clientProperties.getPostMessageQuery()))
-                        .findAny()
-                        .orElse(null);
+                var comment = queryComment(group, topic);
+
                 if (isNull(comment)) {
                     if (vkService.createTopicComment(group, topic, clientProperties.getPostMessage()) > 0) {
                         log.info("Topic comment posted! Group: {}, topic: {}", group, topic);
@@ -86,20 +90,23 @@ public class PosterService {
         }
     }
 
+    private WallpostFull queryWallPost(GroupFull group, GetFilter filter) {
+        return vkService.getGroupWallPosts(group, filter).stream()
+                .filter(i -> i.getText().contains(clientProperties.getPostMessageQuery()))
+                .findAny()
+                .orElse(null);
+    }
+
     private void sendGroupMessage(GroupFull group) throws InterruptedException {
-        if (Boolean.FALSE.equals(clientProperties.getPostToGroups())) return;
+        if (FALSE.equals(clientProperties.getPostToGroups())) return;
 
         if (!clientProperties.getExcludedGroups().contains(group.getId())) {
-            WallpostFull post = vkService.getGroupWallPosts(group, GetFilter.SUGGESTS).stream()
-                    .filter(i -> i.getText().contains(clientProperties.getPostMessageQuery()))
-                    .findAny()
-                    .orElse(null);
+            var post = queryWallPost(group, GetFilter.SUGGESTS);
+
             if (isNull(post)) {
-                post = vkService.getGroupWallPosts(group, GetFilter.ALL).stream()
-                        .filter(i -> i.getText().contains(clientProperties.getPostMessageQuery()))
-                        .findAny()
-                        .orElse(null);
+                post = queryWallPost(group, GetFilter.ALL);
             }
+
             if (isNull(post)) {
                 if (vkService.createWallPost(group, clientProperties.getPostMessage()).getPostId() > 0) {
                     log.info("Group message posted! Group: {}", group);
@@ -118,8 +125,14 @@ public class PosterService {
         Thread.sleep(clientProperties.getQueryInterval());
     }
 
+    private List<Tag> queryTags() {
+        return vkService.getTags().stream()
+                .filter(tag -> clientProperties.getTags().contains(tag.getName()))
+                .collect(Collectors.toList());
+    }
+
     public Integer process() throws InterruptedException {
-        if (Boolean.FALSE.equals(authorizeClient())) {
+        if (FALSE.equals(authorizeClient())) {
             log.error("Failed to authorize API requests. Check your settings!");
             return 1;
         }
@@ -128,16 +141,12 @@ public class PosterService {
         vkService.setTopicCommentsQuerySize(clientProperties.getGroupTopicQuerySize());
         vkService.setGroupWallPostsQuerySize(clientProperties.getGroupPostQuerySize());
 
-        List<Tag> tags = vkService.getTags().stream()
-                .filter(tag -> clientProperties.getTags().contains(tag.getName()))
-                .collect(Collectors.toList());
-
-        for (Tag tag : tags) {
+        for (var tag : queryTags()) {
 
             log.info("Selected tag: {}", tag);
 
-            for (Page page : vkService.getTagPages(tag)) {
-                GroupFull group = page.getGroup();
+            for (var page : vkService.getTagPages(tag)) {
+                var group = page.getGroup();
 
                 log.info("Selected group: {}", group);
 

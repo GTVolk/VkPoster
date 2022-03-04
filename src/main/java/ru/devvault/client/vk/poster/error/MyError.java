@@ -32,7 +32,7 @@ public class MyError extends Error {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        MyError error = (MyError) o;
+        var error = (MyError) o;
         return Objects.equals(((MyError) o).getErrorText(), error.getErrorText()) &&
                 Objects.equals(((MyError) o).getErrorMsg(), error.getErrorMsg()) &&
                 Objects.equals(((MyError) o).getRequestParams(), error.getRequestParams()) &&

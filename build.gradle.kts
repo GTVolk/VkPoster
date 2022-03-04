@@ -9,7 +9,7 @@ plugins {
 }
 
 group = "ru.devvault.client.vk"
-version = "0.0.1-SNAPSHOT"
+version = "0.0.2-SNAPSHOT"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
@@ -24,17 +24,18 @@ repositories {
 }
 
 dependencies {
-	implementation("com.vk.api:sdk:1.0.11") {
+	implementation("com.vk.api:sdk:1.0.14") {
 		exclude("org.apache.logging.log4j")
 	}
-	implementation("org.springframework.boot:spring-boot-starter:2.5.6")
-	implementation("org.springframework.boot:spring-boot-starter-validation:2.5.6")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.0")
-	implementation("org.jetbrains.kotlin:kotlin-reflect:1.5.31")
-	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.5.31")
+	annotationProcessor("org.springframework.boot:spring-boot-configuration-processor:2.6.3")
+	implementation("org.springframework.boot:spring-boot-starter:2.6.3")
+	implementation("org.springframework.boot:spring-boot-starter-validation:2.6.3")
+	implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
+	implementation("org.jetbrains.kotlin:kotlin-reflect:1.6.0")
+	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.6.0")
 	compileOnly("org.projectlombok:lombok:1.18.22")
 	annotationProcessor("org.projectlombok:lombok:1.18.22")
-	testImplementation("org.springframework.boot:spring-boot-starter-test:2.5.6")
+	testImplementation("org.springframework.boot:spring-boot-starter-test:2.6.3")
 }
 
 tasks.withType<KotlinCompile> {
