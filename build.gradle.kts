@@ -8,7 +8,6 @@ plugins {
 }
 
 group = "ru.devvault"
-version = "0.0.3"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {

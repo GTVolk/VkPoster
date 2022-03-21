@@ -10,12 +10,12 @@ import ru.devvault.vk.poster.service.PosterService;
 @SpringBootApplication
 @Slf4j
 @RequiredArgsConstructor
-public class PosterApplication implements CommandLineRunner {
+public class VkPosterApplication implements CommandLineRunner {
 
 	private final PosterService posterService;
 
 	public static void main(String[] args) {
-		SpringApplication.run(PosterApplication.class, args);
+		SpringApplication.run(VkPosterApplication.class, args);
 	}
 
 	@Override
