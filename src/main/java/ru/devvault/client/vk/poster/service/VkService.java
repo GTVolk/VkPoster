@@ -99,7 +99,8 @@ public class VkService {
         log.debug("Response json: {}", textResponse);
 
         var jsonReader = new JsonReader(new StringReader(textResponse));
-        var json = (JsonObject) JsonParser.parseReader(jsonReader);
+        var jsonParser = new JsonParser();
+        var json = (JsonObject) jsonParser.parse(jsonReader);
 
         if (json.has("error")) {
             var errorElement = json.get("error");
