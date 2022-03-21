@@ -1,19 +1,11 @@
-package ru.devvault.client.vk.poster.service;
+package ru.devvault.vk.poster.service;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
-import com.google.gson.JsonSyntaxException;
+import com.google.gson.*;
 import com.google.gson.stream.JsonReader;
 import com.vk.api.sdk.client.AbstractQueryBuilder;
 import com.vk.api.sdk.client.VkApiClient;
 import com.vk.api.sdk.client.actors.UserActor;
-import com.vk.api.sdk.exceptions.ApiException;
-import com.vk.api.sdk.exceptions.ClientException;
-import com.vk.api.sdk.exceptions.ExceptionMapper;
-import com.vk.api.sdk.exceptions.OAuthException;
-import com.vk.api.sdk.exceptions.RequiredFieldException;
+import com.vk.api.sdk.exceptions.*;
 import com.vk.api.sdk.objects.UserAuthResponse;
 import com.vk.api.sdk.objects.Validable;
 import com.vk.api.sdk.objects.base.UserGroupFields;
@@ -34,8 +26,8 @@ import com.vk.api.sdk.objects.wall.responses.PostResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.devvault.client.vk.poster.error.MyApiException;
-import ru.devvault.client.vk.poster.error.MyError;
+import ru.devvault.vk.poster.error.MyApiException;
+import ru.devvault.vk.poster.error.MyError;
 
 import java.io.StringReader;
 import java.lang.reflect.Type;

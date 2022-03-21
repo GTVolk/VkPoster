@@ -1,11 +1,11 @@
-package ru.devvault.client.vk.poster;
+package ru.devvault.vk.poster;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import ru.devvault.client.vk.poster.service.PosterService;
+import ru.devvault.vk.poster.service.PosterService;
 
 @SpringBootApplication
 @Slf4j

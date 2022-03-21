@@ -1,4 +1,4 @@
-package ru.devvault.client.vk.poster.service;
+package ru.devvault.vk.poster.service;
 
 import com.vk.api.sdk.objects.board.Topic;
 import com.vk.api.sdk.objects.board.TopicComment;
@@ -9,9 +9,10 @@ import com.vk.api.sdk.objects.wall.WallpostFull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import ru.devvault.client.vk.poster.configuration.ClientProperties;
+import ru.devvault.vk.poster.configuration.ClientProperties;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static java.lang.Boolean.FALSE;
@@ -53,11 +54,10 @@ public class PosterService {
         return authResult;
     }
 
-    private TopicComment queryComment(GroupFull group, Topic topic) {
+    private Optional<TopicComment> queryComment(GroupFull group, Topic topic) {
         return vkService.getTopicComments(group, topic).stream()
                 .filter(i -> i.getText().contains(clientProperties.getPostMessageQuery()))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     private void sendTopicComments(GroupFull group) throws InterruptedException {
@@ -71,7 +71,7 @@ public class PosterService {
 
                 var comment = queryComment(group, topic);
 
-                if (isNull(comment)) {
+                if (comment.isEmpty()) {
                     if (vkService.createTopicComment(group, topic, clientProperties.getPostMessage()) > 0) {
                         log.info("Topic comment posted! Group: {}, topic: {}", group, topic);
                     } else {
@@ -90,11 +90,10 @@ public class PosterService {
         }
     }
 
-    private WallpostFull queryWallPost(GroupFull group, GetFilter filter) {
+    private Optional<WallpostFull> queryWallPost(GroupFull group, GetFilter filter) {
         return vkService.getGroupWallPosts(group, filter).stream()
                 .filter(i -> i.getText().contains(clientProperties.getPostMessageQuery()))
-                .findAny()
-                .orElse(null);
+                .findAny();
     }
 
     private void sendGroupMessage(GroupFull group) throws InterruptedException {
@@ -103,11 +102,11 @@ public class PosterService {
         if (!clientProperties.getExcludedGroups().contains(group.getId())) {
             var post = queryWallPost(group, GetFilter.SUGGESTS);
 
-            if (isNull(post)) {
+            if (post.isEmpty()) {
                 post = queryWallPost(group, GetFilter.ALL);
             }
 
-            if (isNull(post)) {
+            if (post.isEmpty()) {
                 if (vkService.createWallPost(group, clientProperties.getPostMessage()).getPostId() > 0) {
                     log.info("Group message posted! Group: {}", group);
                 } else {

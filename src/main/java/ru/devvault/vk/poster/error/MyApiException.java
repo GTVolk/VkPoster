@@ -1,4 +1,4 @@
-package ru.devvault.client.vk.poster.error;
+package ru.devvault.vk.poster.error;
 
 import com.vk.api.sdk.exceptions.ApiException;
 

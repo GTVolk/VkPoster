@@ -1,29 +1,21 @@
-package ru.devvault.client.vk.poster.configuration;
+package ru.devvault.vk.poster.configuration;
 
 
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.validation.annotation.Validated;
-import ru.devvault.client.vk.poster.enums.AuthType;
+import ru.devvault.vk.poster.enums.AuthType;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
+import javax.validation.constraints.*;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+@Data
 @Configuration
 @Validated
-@ConfigurationProperties(prefix = "ru.devvault.client.vk.poster")
-@Getter
-@Setter
-@ToString
+@ConfigurationProperties(prefix = "ru.devvault.vk.poster")
 public class ClientProperties {
 
     @NotNull
